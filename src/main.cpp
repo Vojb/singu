@@ -13,9 +13,7 @@
 
 #define DISTANCE_MIN 30 
 
-int distance_current();
-void state_set();
-
+typedef uint8_t State;
 typedef uint8_t Direction;
 
 typedef struct SpinData
@@ -24,8 +22,18 @@ typedef struct SpinData
   Direction direction;
 } SpinData;
 
+typedef struct Robot
+{
+  State state;
+  SpinData spin_data;
+} Robot;
+
+
 uint8_t _state = STATE_STARTING;
 SpinData _spin_data;
+
+int distance_current();
+void state_set();
 
 void init_spin_data()
 {
