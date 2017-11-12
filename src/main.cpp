@@ -1,23 +1,30 @@
-#define STATE_STARTING
-#define STATE_MOVING_FORWARD
-#define STATE_MOVING_SPINNING
-#define STATE_MOVING_BACKWARD
-#define STATE_MOVING_STILL
-#define STATE_SEARCHING_PATH
+#include <stdint.h>
+#include <Arduino.h>
 
-#define DIRECTION_RIGHT = 0
-#define DIRECTION_LEFT = 1
+#define STATE_STARTING        0
+#define STATE_MOVING_FORWARD  1
+#define STATE_MOVING_SPINNING 2
+#define STATE_MOVING_BACKWARD 3
+#define STATE_MOVING_STILL    4
+#define STATE_SEARCHING_PATH  5
+
+#define DIRECTION_RIGHT 0
+#define DIRECTION_LEFT  1
 
 #define DISTANCE_MIN 30 
 
+int distance_current();
+void state_set();
+
 typedef uint8_t Direction;
 
-typedef struct 
+typedef struct SpinData
 {
   int angle;
+  Direction direction;
 } SpinData;
 
-uint8_t _state = STATE_STARTING
+uint8_t _state = STATE_STARTING;
 SpinData _spin_data;
 
 void init_spin_data()
@@ -31,15 +38,21 @@ void setup()
   init_spin_data();
 }
 
-bool distance_too_close()
+void state_set(int state)
 {
-  return distance_current()
+  _state = state;
 }
 
-float distance_current()
+int distance_current()
 {
   return 0;
 }
+
+bool distance_too_close()
+{
+  return distance_current() < DISTANCE_MIN;
+}
+
 
 void handle_state_starting()
 {
@@ -89,30 +102,26 @@ void distance_find_right_max(int *angle, float *distance)
 void set_state_moving_spinning(int angle, Direction direction)
 {
   _spin_data.angle = angle;
-  _sping_data.direction = direction
-  set_state(STATE_MOVING_SPINNING);
+  _spin_data.direction = direction;
+  state_set(STATE_MOVING_SPINNING);
 }
 
 void handle_state_searching_path()
 {
   int angle_left = -1;
   int angle_right = -1;
-  int angle_target = -1;
 
   float distance_left = -1;
-  float distance_right -1;
-  float distance_target = -1;
+  float distance_right = -1;
 
-
-  distance_find_left_max(*angle_left, *distance_left);
-  distance_find_right_max(*angle_right, *distance_right);
-
+  distance_find_left_max(&angle_left, &distance_left);
+  distance_find_right_max(&angle_right, &distance_right);
 
   float distance_target = distance_right;
   int angle_target = angle_right;
   Direction direction = DIRECTION_RIGHT;
 
-  if (distance_left > target_distance)
+  if (distance_left > distance_target)
   {
     distance_target = distance_left;
     angle_target = angle_target;
@@ -121,20 +130,11 @@ void handle_state_searching_path()
 
   if (distance_target < DISTANCE_MIN)
   {
-    set_state(STATE_MOVING_BACKWARD);
+    state_set(STATE_MOVING_BACKWARD);
     return;
   }
 
-  switch(direction)
-  {
-    case DIRECTION_RIGHT:
-      set_state_moving_spinning((angle_target - 90), direction);
-      break;
-    case DIRECITON_LEFT:
-      set_state_moving_spinning(direction);
-      break;
-  }
-
+  set_state_moving_spinning(angle_target, direction);
 }
 
 void handle_state_moving_still()
