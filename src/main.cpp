@@ -13,7 +13,7 @@
 #define DIRECTION_RIGHT 0
 #define DIRECTION_LEFT  1
 
-#define DISTANCE_MIN 30 
+#define DISTANCE_MIN 100 
 
 #define WHEEL_LEFT_MOTOR 9
 #define WHEEL_LEFT_BACKWARD 8
@@ -264,27 +264,26 @@ void setup()
   }
   distance = get_distance();
   ultra_sight_servo.attach(SERVO_PIN);
-  ultra_sight_servo.write(180);
   pinMode(WHEEL_LEFT_BACKWARD, OUTPUT);
   pinMode(WHEEL_LEFT_MOTOR, OUTPUT);
   pinMode(WHEEL_RIGHT_MOTOR, OUTPUT);
   pinMode(WHEEL_RIGHT_BACKWARD, OUTPUT);
   motors_stop();
+  delay(5000);
+
   motors_forward();
 
-   ultra_sight_servo.write(90);
 }
 void loop()
 {
   Serial.println("distance:");       
   Serial.println(get_distance());
- 
   if(get_distance()<DISTANCE_MIN){
 
   Serial.println("börjar backa");
    motors_right_backward();
    motors_left_forward();
-   delay(1000);
+   delay(100);
    motors_forward();
   }
 
