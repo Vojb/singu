@@ -1,20 +1,29 @@
 package com.vojbart.zingu
 
+import android.annotation.TargetApi
 import android.graphics.Color
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import kotlinx.android.synthetic.main.activity_main.*
 import android.content.DialogInterface
 import android.bluetooth.BluetoothAdapter
+import android.content.Context
 import android.support.v7.app.AlertDialog
 import android.content.Intent
 import android.os.Handler
 import android.util.Log
 import android.view.MotionEvent
 import android.view.View
+import android.view.Window
+import android.view.WindowManager
 import android.widget.Toast
 import io.reactivex.Completable
 import io.reactivex.schedulers.Schedulers
+import android.os.VibrationEffect
+import android.os.Build
+import android.os.Vibrator
+
+
 
 interface CommunicationInterface {
     fun onConnectedToDevice()
@@ -28,11 +37,29 @@ class MainActivity : AppCompatActivity(), CommunicationInterface {
     override fun onConnectedToDevice() {
         background_layout.background = getDrawable(R.color.colorPrimary)
         progressBar.visibility = View.GONE
+        text_connect_to_zingu.text = "DISCONNECT"
+        text_connect_to_zingu.setOnClickListener {
+            bluetoothCom.disconnect()
+        }
+        enableButtons(true)
+    }
+
+    fun enableButtons(bool:Boolean) {
+        button_drive.isEnabled = bool
+        button_reverse.isEnabled = bool
+        button_right.isEnabled = bool
+        button_left.isEnabled = bool
     }
 
     override fun onDisconnected() {
         background_layout.background = getDrawable(R.color.red)
         progressBar.visibility = View.GONE
+        text_connect_to_zingu.text = "CONNECT"
+        text_connect_to_zingu.setOnClickListener {
+            bluetoothCom.connect("98:D3:32:70:61:BB")
+
+        }
+        enableButtons(false)
 
     }
 
@@ -45,8 +72,6 @@ class MainActivity : AppCompatActivity(), CommunicationInterface {
 
     }
 
-    var buttonPressed = false
-
     var REQUEST_BLUETOOTH = 1
 
     lateinit var bluetoothCom: BluetoothCom
@@ -55,8 +80,11 @@ class MainActivity : AppCompatActivity(), CommunicationInterface {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        window.setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN)
+        requestWindowFeature(Window.FEATURE_NO_TITLE)
         setContentView(R.layout.activity_main)
-        window.navigationBarColor = Color.TRANSPARENT
+        window.navigationBarColor= Color.BLACK
+        enableButtons(false)
 
         val BTAdapter = BluetoothAdapter.getDefaultAdapter()
         bluetoothCom = BluetoothCom(this)
@@ -64,6 +92,10 @@ class MainActivity : AppCompatActivity(), CommunicationInterface {
         if (!BTAdapter.isEnabled) {
             val enableBT = Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE)
             startActivityForResult(enableBT, REQUEST_BLUETOOTH)
+        }
+
+        text_connect_to_zingu.setOnClickListener {
+            bluetoothCom.connect("98:D3:32:70:61:BB")
         }
 
         // Phone does not support Bluetooth so let the user know and exit.
@@ -89,7 +121,7 @@ class MainActivity : AppCompatActivity(), CommunicationInterface {
         button_reverse.setOnTouchListener { v, event ->
             buttonPressed(event, object : Runnable {
                 override fun run() {
-                    go("r")
+                    go("b")
                 }
             })
             false
@@ -115,17 +147,19 @@ class MainActivity : AppCompatActivity(), CommunicationInterface {
             bluetoothCom.showDeviceListDialog()
         }
 
-        text_connect_to_zingu.setOnClickListener {
-            bluetoothCom.connect("98:D3:32:70:61:BB")
 
-        }
     }
 
+    @TargetApi(Build.VERSION_CODES.O)
     fun Runnable.go(string: String) {
         if (mHandler != null) {
             bluetoothCom.write(string)
             Log.d("pressed", string)
             mHandler!!.postDelayed(this, 50)
+            val v = getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
+
+                v.vibrate(VibrationEffect.createOneShot(100, VibrationEffect.DEFAULT_AMPLITUDE))
+
         }
     }
 

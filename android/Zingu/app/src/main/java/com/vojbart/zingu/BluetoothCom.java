@@ -95,6 +95,10 @@ public class BluetoothCom implements BluetoothSerialListener {
         mBluetoothSerial.connect(address);
     }
 
+    public void disconnect() {
+       mBluetoothSerial.stop();
+    }
+
     public void write(String message) {
         mBluetoothSerial.write(message);
     }
