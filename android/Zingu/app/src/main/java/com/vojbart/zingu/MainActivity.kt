@@ -163,7 +163,7 @@ class MainActivity : AppCompatActivity(), CommunicationInterface {
         if (mHandler != null) {
             bluetoothCom.write(string)
             Log.d("pressed", string)
-            mHandler!!.postDelayed(this, 0)
+            mHandler!!.post(this)
             val v = getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
 
                 v.vibrate(VibrationEffect.createOneShot(100, VibrationEffect.DEFAULT_AMPLITUDE))
@@ -175,7 +175,7 @@ class MainActivity : AppCompatActivity(), CommunicationInterface {
         when (event.action) {
             MotionEvent.ACTION_DOWN -> {
                 mHandler = Handler()
-                mHandler!!.postDelayed(mAction, 20)
+                mHandler!!.post(mAction)
                 true
             }
             // Do something
