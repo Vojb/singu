@@ -9,6 +9,8 @@
 #define CMD_SPIN_LEFT 'l'
 #define CMD_STOP 's'
 
+#define PIN_CONNECTED 2
+
 #define WHEEL_LEFT_BACKWARD 8
 #define WHEEL_LEFT_MOTOR_ON 9
 
@@ -73,11 +75,25 @@ void setup()
   pinMode(WHEEL_LEFT_MOTOR_ON, OUTPUT);
   pinMode(WHEEL_LEFT_BACKWARD, OUTPUT);
 
+  pinMode(PIN_CONNECTED, INPUT);
+
   Serial.begin(BAUD_RATE);
 }
 
 void loop()
 {
+  if (digitalRead(PIN_CONNECTED) == LOW)
+  {
+    if (_last_cmd == CMD_STOP)
+    {
+      return;
+    }
+
+    _last_cmd = CMD_STOP;
+    motors_stop();
+    return;
+  }
+
   if (Serial.available() <= 0)
   {
     return;
