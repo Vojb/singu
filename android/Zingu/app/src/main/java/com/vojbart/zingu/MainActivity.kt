@@ -1,5 +1,6 @@
 package com.vojbart.zingu
 
+import android.annotation.SuppressLint
 import android.annotation.TargetApi
 import android.graphics.Color
 import android.support.v7.app.AppCompatActivity
@@ -44,12 +45,6 @@ class MainActivity : AppCompatActivity(), CommunicationInterface {
         enableButtons(true)
     }
 
-    fun enableButtons(bool:Boolean) {
-        button_drive.isEnabled = bool
-        button_reverse.isEnabled = bool
-        button_right.isEnabled = bool
-        button_left.isEnabled = bool
-    }
 
     override fun onDisconnected() {
         background_layout.background = getDrawable(R.color.red)
@@ -109,7 +104,7 @@ class MainActivity : AppCompatActivity(), CommunicationInterface {
         }
 
 
-        button_drive.setOnTouchListener { v, event ->
+        button_drive.setOnTouchListener { _, event ->
             buttonPressed(event, object : Runnable {
                 override fun run() {
                     go("f")
@@ -147,7 +142,20 @@ class MainActivity : AppCompatActivity(), CommunicationInterface {
             bluetoothCom.showDeviceListDialog()
         }
 
+    }
 
+    override fun onResume() {
+        super.onResume()
+        fullScreen()
+        window.setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN)
+
+    }
+
+    private fun enableButtons(bool:Boolean) {
+        button_drive.isEnabled = bool
+        button_reverse.isEnabled = bool
+        button_right.isEnabled = bool
+        button_left.isEnabled = bool
     }
 
     @TargetApi(Build.VERSION_CODES.O)
@@ -155,7 +163,7 @@ class MainActivity : AppCompatActivity(), CommunicationInterface {
         if (mHandler != null) {
             bluetoothCom.write(string)
             Log.d("pressed", string)
-            mHandler!!.postDelayed(this, 50)
+            mHandler!!.postDelayed(this, 0)
             val v = getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
 
                 v.vibrate(VibrationEffect.createOneShot(100, VibrationEffect.DEFAULT_AMPLITUDE))
@@ -167,7 +175,7 @@ class MainActivity : AppCompatActivity(), CommunicationInterface {
         when (event.action) {
             MotionEvent.ACTION_DOWN -> {
                 mHandler = Handler()
-                mHandler!!.postDelayed(mAction, 50)
+                mHandler!!.postDelayed(mAction, 20)
                 true
             }
             // Do something
@@ -179,6 +187,19 @@ class MainActivity : AppCompatActivity(), CommunicationInterface {
 
             }
             // No longer down
+        }
+    }
+
+    @SuppressLint("ObsoleteSdkInt")
+    fun fullScreen() {
+        if (Build.VERSION.SDK_INT in 12..18) { // lower api
+            val v = this.window.decorView
+            v.systemUiVisibility = View.GONE
+        } else if (Build.VERSION.SDK_INT >= 19) {
+            //for new api versions.
+            val decorView = window.decorView
+            val uiOptions = View.SYSTEM_UI_FLAG_HIDE_NAVIGATION or View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
+            decorView.systemUiVisibility = uiOptions
         }
     }
 }
