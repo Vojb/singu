@@ -3,20 +3,10 @@
 
 #define BAUD_RATE 9600
 
-#define STATE_STARTING 0
-#define STATE_MOVING_FORWARD 1
-#define STATE_MOVING_SPINNING 2
-#define STATE_MOVING_BACKWARD 3
-#define STATE_MOVING_STILL 4
-#define STATE_SEARCHING_PATH 5
-
 #define CMD_FORWARD 'f'
 #define CMD_BACKWARD 'b'
 #define CMD_SPIN_RIGHT 'r'
 #define CMD_SPIN_LEFT 'l'
-
-#define DIRECTION_RIGHT 0
-#define DIRECTION_LEFT 1
 
 #define WHEEL_LEFT_MOTOR_ON 9
 #define WHEEL_LEFT_BACKWARD 8
@@ -24,10 +14,15 @@
 #define WHEEL_RIGHT_MOTOR_ON 10
 #define WHEEL_RIGHT_FORWARD 11
 
-unsigned long _last_cmd = 0;
+uint8_t _available = 0;
+char _cmd = 0;
+char _last_cmd = 0;
+unsigned long _last_cmd_at = 0;
+bool _moving = false;
 
 void motors_spin_right()
 {
+  _moving = true;
   digitalWrite(WHEEL_RIGHT_MOTOR_ON, HIGH);
   digitalWrite(WHEEL_RIGHT_FORWARD, LOW);
 
@@ -37,6 +32,7 @@ void motors_spin_right()
 
 void motors_spin_left()
 {
+  _moving = true;
   digitalWrite(WHEEL_RIGHT_MOTOR_ON, HIGH);
   digitalWrite(WHEEL_RIGHT_FORWARD, HIGH);
 
@@ -46,6 +42,7 @@ void motors_spin_left()
 
 void motors_forward()
 {
+  _moving = true;
   digitalWrite(WHEEL_RIGHT_MOTOR_ON, HIGH);
   digitalWrite(WHEEL_RIGHT_FORWARD, HIGH);
 
@@ -55,6 +52,7 @@ void motors_forward()
 
 void motors_backward()
 {
+  _moving = true;
   digitalWrite(WHEEL_RIGHT_MOTOR_ON, HIGH);
   digitalWrite(WHEEL_RIGHT_FORWARD, LOW);
 
@@ -64,6 +62,7 @@ void motors_backward()
 
 void motors_stop()
 {
+  _moving = false;
   digitalWrite(WHEEL_RIGHT_MOTOR_ON, LOW);
   digitalWrite(WHEEL_RIGHT_FORWARD, LOW);
 
@@ -86,11 +85,24 @@ void setup()
 
 void loop()
 {
-  char cmd = NULL;
-  while (Serial.available() > 0)
+
+  _available = Serial.available();
+  while (_available > 0)
   {
-    cmd = Serial.read();
-    switch (cmd)
+    /*
+    for (uint8_t i = 0; i < _available; i++)
+    {
+      _cmd = Serial.read();
+    }
+    */
+
+    _cmd = Serial.read();
+    _last_cmd_at = millis();
+    if (_last_cmd == _cmd) {
+      continue;
+    }
+
+    switch (_cmd)
     {
     case CMD_FORWARD:
       motors_forward();
@@ -105,11 +117,11 @@ void loop()
       motors_spin_left();
       break;
     }
-  }
-  if (cmd != NULL)
-  {
-    delay(75);
+    _available = Serial.available();
   }
 
-  motors_stop();
+  if (_moving && (millis() - _last_cmd_at) > 100)
+  {
+    motors_stop();
+  }
 }
