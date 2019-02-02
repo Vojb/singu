@@ -2,9 +2,10 @@
 <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/background_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/colorPrimaryDark"
+    android:background="@color/red"
     tools:context=".MainActivity">
 
 
@@ -12,7 +13,6 @@
         android:id="@+id/button_drive"
         style="@style/ButtonControl"
         android:layout_width="150dp"
-        android:layout_height="wrap_content"
         android:layout_marginBottom="8dp"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
@@ -27,7 +27,6 @@
         android:id="@+id/button_reverse"
         style="@style/ButtonControl"
         android:layout_width="150dp"
-        android:layout_height="wrap_content"
         android:layout_marginBottom="8dp"
 
 
@@ -44,10 +43,8 @@
         android:id="@+id/button_right"
         style="@style/ButtonControl"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
         android:layout_marginBottom="8dp"
         android:layout_marginEnd="16dp"
-
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         android:text="RIGHT"
@@ -56,17 +53,14 @@
         app:layout_constraintStart_toEndOf="@+id/button_drive"
         app:layout_constraintTop_toBottomOf="@+id/button_drive" />
 
-
     <Button
         android:id="@+id/button_left"
         style="@style/ButtonControl"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
         android:layout_marginBottom="8dp"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
-
         android:text="LEFT"
         app:layout_constraintBottom_toTopOf="@+id/button_reverse"
         app:layout_constraintEnd_toStartOf="@+id/button_drive"
@@ -78,8 +72,36 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
+        android:visibility="gone"
         android:layout_marginTop="8dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@android:drawable/ic_menu_manage" />
+
+    <TextView
+        android:id="@+id/text_connect_to_zingu"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:text="CONNECT"
+        android:textSize="24dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ProgressBar
+        android:id="@+id/progressBar"
+        style="?android:attr/progressBarStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 </android.support.constraint.ConstraintLayout>

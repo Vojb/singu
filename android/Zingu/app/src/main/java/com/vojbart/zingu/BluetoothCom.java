@@ -21,6 +21,7 @@ import java.util.Set;
 
 public class BluetoothCom implements BluetoothSerialListener {
 
+    public CommunicationInterface iCom;
     private BluetoothSerial mBluetoothSerial;
     private Context mContext;
 
@@ -60,17 +61,19 @@ public class BluetoothCom implements BluetoothSerialListener {
 
     @Override
     public void onBluetoothDeviceDisconnected() {
+        iCom.onDisconnected();
         Log.v("DISConnecting", "disconnected ");
     }
 
     @Override
     public void onConnectingBluetoothDevice() {
-
+        iCom.onConnecting();
         Log.v("Connecting", "connecting ");
     }
 
     @Override
     public void onBluetoothDeviceConnected(String name, String address) {
+        iCom.onConnectedToDevice();
         Log.v("Connected", name + " : " + address);
 
     }
@@ -97,6 +100,7 @@ public class BluetoothCom implements BluetoothSerialListener {
     }
 
     public Set<BluetoothDevice> getPairedDevices() {
+
         return mBluetoothSerial.getPairedDevices();
     }
 
