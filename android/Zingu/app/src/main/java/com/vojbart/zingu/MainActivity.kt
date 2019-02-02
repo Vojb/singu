@@ -23,7 +23,7 @@ import io.reactivex.schedulers.Schedulers
 import android.os.VibrationEffect
 import android.os.Build
 import android.os.Vibrator
-
+import io.reactivex.internal.operators.flowable.FlowableInterval
 
 
 interface CommunicationInterface {
@@ -165,9 +165,7 @@ class MainActivity : AppCompatActivity(), CommunicationInterface {
             Log.d("pressed", string)
             mHandler!!.post(this)
             val v = getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
-
                 v.vibrate(VibrationEffect.createOneShot(100, VibrationEffect.DEFAULT_AMPLITUDE))
-
         }
     }
 
@@ -180,6 +178,7 @@ class MainActivity : AppCompatActivity(), CommunicationInterface {
             }
             // Do something
             MotionEvent.ACTION_UP -> {
+                bluetoothCom.write("s")
                 if (mHandler == null)
                     mHandler!!.removeCallbacks(mAction)
                 mHandler = null
