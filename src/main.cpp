@@ -86,22 +86,16 @@ void setup()
 void loop()
 {
 
-  _available = Serial.available();
-  while (_available > 0)
+  while (Serial.available() > 0)
   {
-    /*
-    for (uint8_t i = 0; i < _available; i++)
-    {
-      _cmd = Serial.read();
-    }
-    */
-
     _cmd = Serial.read();
     _last_cmd_at = millis();
-    if (_last_cmd == _cmd) {
+    if (_last_cmd == _cmd)
+    {
       continue;
     }
 
+    _last_cmd = _cmd;
     switch (_cmd)
     {
     case CMD_FORWARD:
@@ -117,11 +111,11 @@ void loop()
       motors_spin_left();
       break;
     }
-    _available = Serial.available();
   }
 
-  if (_moving && (millis() - _last_cmd_at) > 100)
+  if (_moving && (millis() - _last_cmd_at) > 50)
   {
+    _last_cmd = 0;
     motors_stop();
   }
 }
