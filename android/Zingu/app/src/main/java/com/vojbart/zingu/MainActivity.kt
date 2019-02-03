@@ -23,6 +23,7 @@ import io.reactivex.schedulers.Schedulers
 import android.os.VibrationEffect
 import android.os.Build
 import android.os.Vibrator
+import android.support.annotation.RequiresApi
 import io.reactivex.internal.operators.flowable.FlowableInterval
 
 
@@ -73,12 +74,13 @@ class MainActivity : AppCompatActivity(), CommunicationInterface {
 
     private var mHandler: Handler? = null
 
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         window.setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN)
         requestWindowFeature(Window.FEATURE_NO_TITLE)
         setContentView(R.layout.activity_main)
-        window.navigationBarColor= Color.BLACK
+        window.navigationBarColor = Color.BLACK
         enableButtons(false)
 
         val BTAdapter = BluetoothAdapter.getDefaultAdapter()
@@ -105,36 +107,20 @@ class MainActivity : AppCompatActivity(), CommunicationInterface {
 
 
         button_drive.setOnTouchListener { _, event ->
-            buttonPressed(event, object : Runnable {
-                override fun run() {
-                    go("f")
-                }
-            })
+            buttonPressed(event, "f")
             false
         }
 
         button_reverse.setOnTouchListener { v, event ->
-            buttonPressed(event, object : Runnable {
-                override fun run() {
-                    go("b")
-                }
-            })
+            buttonPressed(event, "b")
             false
         }
         button_left.setOnTouchListener { v, event ->
-            buttonPressed(event, object : Runnable {
-                override fun run() {
-                    go("l")
-                }
-            })
+            buttonPressed(event, "l")
             false
         }
         button_right.setOnTouchListener { v, event ->
-            buttonPressed(event, object : Runnable {
-                override fun run() {
-                    go("r")
-                }
-            })
+            buttonPressed(event, "r")
             false
         }
 
@@ -151,7 +137,7 @@ class MainActivity : AppCompatActivity(), CommunicationInterface {
 
     }
 
-    private fun enableButtons(bool:Boolean) {
+    private fun enableButtons(bool: Boolean) {
         button_drive.isEnabled = bool
         button_reverse.isEnabled = bool
         button_right.isEnabled = bool
@@ -165,24 +151,21 @@ class MainActivity : AppCompatActivity(), CommunicationInterface {
             Log.d("pressed", string)
             mHandler!!.post(this)
             val v = getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
-                v.vibrate(VibrationEffect.createOneShot(100, VibrationEffect.DEFAULT_AMPLITUDE))
+            v.vibrate(VibrationEffect.createOneShot(100, VibrationEffect.DEFAULT_AMPLITUDE))
         }
     }
 
-    private fun buttonPressed(event: MotionEvent, mAction: Runnable) {
+    @RequiresApi(Build.VERSION_CODES.O)
+    private fun buttonPressed(event: MotionEvent, string: String) {
         when (event.action) {
             MotionEvent.ACTION_DOWN -> {
-                mHandler = Handler()
-                mHandler!!.post(mAction)
-                true
+                bluetoothCom.write(string)
+                val v = getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
+                v.vibrate(VibrationEffect.createOneShot(100, VibrationEffect.DEFAULT_AMPLITUDE))
             }
             // Do something
             MotionEvent.ACTION_UP -> {
                 bluetoothCom.write("s")
-                if (mHandler == null)
-                    mHandler!!.removeCallbacks(mAction)
-                mHandler = null
-                true
 
             }
             // No longer down
